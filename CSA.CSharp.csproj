@@ -172,6 +172,7 @@
     <None Include="Assets\Plugins\iOS\VuforiaMediaSource\src\VideoPlayerWrapper.mm.txt" />
     <None Include="Assets\Resources\Vuforia_About.txt" />
     <None Include="Assets\StreamingAssets\QCAR\Artist.xml" />
+    <None Include="Assets\StreamingAssets\QCAR\Landscapes.xml" />
     <None Include="Assets\StreamingAssets\QCAR\StonesAndChips.xml" />
     <None Include="Assets\Textures and Sprites\SF UI\Background\LICENSE.txt" />
     <None Include="Assets\Vuforia\Editor\Scripts\Qualcomm.Vuforia.UnityExtensions.Editor.XML" />

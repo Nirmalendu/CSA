@@ -1,40 +1,48 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
-public class UpdateRoot: MonoBehaviour {
+public class UpdateRoot : MonoBehaviour
+{
 
-    public static int[] childPositions = { 0, 1, 2, 3 };
+    public static Transform[] augObjects = new Transform[8];
+    public static Vector3[] lastPosOfObj = new Vector3[8];
 
-    static int[] winningCombo = { 3, 2, 1, 0 };
+    public static bool matchingConditionMet = false;
+    bool match;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    public Text winText;
+    // Use this for initialization
+    void Start()
+    {
+        winText.text = "";
+    }
 
-        transform.position = IMTargetSensor.currentTransform.position;
-        transform.eulerAngles = IMTargetSensor.currentTransform.eulerAngles;
+    // Update is called once per frame
+    void Update()
+    {
 
-        bool hasWon = true;
+        //transform.position = IMTargetSensor.currentTransform.position;
+        //transform.eulerAngles = IMTargetSensor.currentTransform.eulerAngles;
+    }
 
-        for (int i = 0; i < winningCombo.Length; ++i)
+    void LateUpdate()
+    {
+        match = true;
+        for (int i = 0; i < 4; i++)
         {
-            if (winningCombo[i] != childPositions[i])
-                hasWon = false;
-
-            //Debug.Log(childPositions[i]);
+            // Check x-coordinate of top (static) objects with bottom ones
+            if (lastPosOfObj[i].x != lastPosOfObj[i + 4].x)
+            {
+                match = false;
+                break;
+            }
         }
-
-        if (hasWon)
-            Debug.Log("Youve won !!!!!");
-        //else
-        //    Debug.Log("Nope !!!");
-
-        
-
-
+        if (match)
+        {
+            matchingConditionMet = true;
+            winText.text = "Congratulations! Great Job!";
+            //Debug.Log("Matching condition met!");
+        }
     }
 }

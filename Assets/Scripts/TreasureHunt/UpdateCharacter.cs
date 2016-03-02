@@ -1,44 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class UpdateCharacter : MonoBehaviour {
+public class UpdateCharacter : MonoBehaviour
+{
 
-    static int gridX = 2;
-    static int gridY = 2;
-
-
-    static Vector3[] snapPositions = {
-        new Vector3(-100,200, 0),
-        new Vector3( 100,200, 0),
-        new Vector3(-100,200,-200),
-        new Vector3( 100,200,-200),
-
-        //new Vector3(-200,200, 0),
-        //new Vector3(-200,200, -200),
-        //new Vector3(-100,200,-200),
-        //new Vector3( 100,200,-200),
-    };
-
+    public bool isStaticObj;
     public int targetNum;
 
-    bool isAcquired = false;
+    static Vector3[] snapPositions = {
+        new Vector3(-240,100, -100),
+        new Vector3( -80,100, -100),
+        new Vector3( 80,100, -100),
+        new Vector3( 240,100, -100),
+    };
 
+    bool isAcquired = false;
     bool isShown = false;
 
-    int snapPosNum = -1;    
+    //bool isAcquired = true;
+    //bool isShown = true;
 
-	// Use this for initialization
-	void Start () {
+    int snapPosNum = -1;
 
-        snapPosNum = targetNum;
+    // Use this for initialization
+    void Start()
+    {
 
-        this.transform.position = snapPositions[snapPosNum];
+        UpdateRoot.augObjects[targetNum] = transform;
+        UpdateRoot.lastPosOfObj[targetNum] = transform.position;
 
     }
 
     void snapMyPosition()
     {
-        int closestSnapIndex = 0;        
+        int closestSnapIndex = 0;
 
         Vector3 p = this.transform.position;
 
@@ -47,20 +42,37 @@ public class UpdateCharacter : MonoBehaviour {
         for (int i = 1; i < snapPositions.Length; ++i)
         {
             double d = (p - snapPositions[i]).sqrMagnitude;
-            if ( d < curMinDist)
+            if (d < curMinDist)
             {
                 closestSnapIndex = i;
                 curMinDist = d;
             }
         }
 
-        snapPosNum = closestSnapIndex;
 
-        this.transform.position = snapPositions[snapPosNum];
+        snapPosNum = closestSnapIndex;
+        Debug.Log("Snap position is " + snapPositions[snapPosNum]);
+
+        Vector3 newPosition = snapPositions[snapPosNum];
+
+        for (int i = 0; i < UpdateRoot.augObjects.Length; i++)
+        {
+            if (UpdateRoot.lastPosOfObj[i] == newPosition)
+            {
+                UpdateRoot.augObjects[i].position = UpdateRoot.lastPosOfObj[targetNum];
+                UpdateRoot.lastPosOfObj[i] = UpdateRoot.lastPosOfObj[targetNum];
+                Debug.Log("Object to be swapped is " + UpdateRoot.augObjects[i].name);
+                Debug.Log("Target position is " + UpdateRoot.lastPosOfObj[targetNum]);
+            }
+        }
+
+        transform.position = newPosition;
+        UpdateRoot.lastPosOfObj[targetNum] = newPosition;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
 
         if (IMTargetSensor.currentIMTarget == targetNum)
             isAcquired = true;
@@ -77,12 +89,8 @@ public class UpdateCharacter : MonoBehaviour {
 
         foreach (Collider r in GetComponentsInChildren<Collider>())
         {
-            // Render only if we are in front of a fiducual and we acquired the object
             r.enabled = isShown;
         }
-
-        if (isShown)
-            UpdateRoot.childPositions[targetNum] = snapPosNum;
     }
 
     // This stores the layers we want the raycast to hit (make sure this GameObject's layer is included!)
@@ -120,8 +128,11 @@ public class UpdateCharacter : MonoBehaviour {
 
     public void OnFingerDown(Lean.LeanFinger finger)
     {
-        if (!isShown)
+        if (!isShown || isStaticObj)
+        {
+            //Debug.Log("Object" + targetNum + " is not shown");
             return;
+        }
 
         // Raycast information
         var ray = finger.GetRay();
@@ -130,11 +141,14 @@ public class UpdateCharacter : MonoBehaviour {
         // Was this finger pressed down on a collider?
         if (Physics.Raycast(ray, out hit, float.PositiveInfinity, LayerMask) == true)
         {
-            // Debug.Log("Hit something");
+            //Debug.Log("Hit something  object" + hit.collider.gameObject.name);
+            //Debug.Log("Name is " + gameObject.name);
 
             // Was that collider this one?
             if (hit.collider.gameObject == gameObject)
             {
+                Debug.Log("Object" + targetNum + " was the collider");
+
                 // Set the current finger to this one
                 draggingFinger = finger;
             }
@@ -151,7 +165,5 @@ public class UpdateCharacter : MonoBehaviour {
             // Unset the current finger
             draggingFinger = null;
         }
-
-        
     }
 }

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class IMTargetSensor : MonoBehaviour {
+public class IMTargetSensor : MonoBehaviour
+{
 
     public static int currentIMTarget = -1;
     public static Transform currentTransform;
@@ -9,17 +10,17 @@ public class IMTargetSensor : MonoBehaviour {
     public int targetNum;
 
 
-    static bool[]      targetsEnabled    = new bool[4];
-    static Transform[] targetsTransforms = new Transform[4];
+    public static bool[] targetsEnabled = new bool[8];
+    public static Transform[] targetsTransforms = new Transform[8];
 
 
     void Start()
-    {        
+    {
     }
 
     void Update()
     {
-        targetsEnabled[targetNum]    = GetComponent<MeshRenderer>().enabled;
+        targetsEnabled[targetNum] = GetComponent<MeshRenderer>().enabled;
         targetsTransforms[targetNum] = GetComponentInParent<Transform>();
     }
 
@@ -27,7 +28,7 @@ public class IMTargetSensor : MonoBehaviour {
     {
         bool noActiveTarget = true;
 
-        for (int i = 0; i< targetsEnabled.Length; ++i)
+        for (int i = 0; i < targetsEnabled.Length; ++i)
         {
             if (targetsEnabled[i])
             {
@@ -39,10 +40,7 @@ public class IMTargetSensor : MonoBehaviour {
         if (noActiveTarget)
             currentIMTarget = -1;
         else
-        {
             currentTransform = targetsTransforms[currentIMTarget];
-            Debug.Log("currentActiveTarget = " + currentIMTarget);
-        }
 
     }
 
