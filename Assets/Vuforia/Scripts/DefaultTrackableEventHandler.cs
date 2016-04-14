@@ -51,7 +51,7 @@ namespace Vuforia
                 newStatus == TrackableBehaviour.Status.TRACKED ||
                 newStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
             {
-				OnTrackingFound ();
+                OnTrackingFound();
             }
             else
             {

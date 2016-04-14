@@ -94,6 +94,8 @@ public class TrackableEventHandler : MonoBehaviour,
     {
         Renderer[] rendererComponents = GetComponentsInChildren<Renderer>();
         Collider[] colliderComponents = GetComponentsInChildren<Collider>();
+		GameObject[] t = GetComponentsInChildren<GameObject> ();
+
 
         // Enable rendering:
         foreach (Renderer component in rendererComponents)
@@ -107,6 +109,11 @@ public class TrackableEventHandler : MonoBehaviour,
             component.enabled = true;
         }
 
+		foreach (GameObject tc in t)
+		{
+			if (tc.layer == 4)
+				tc.active = true;
+		}
         Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " found");
 
         // Optionally play the video automatically when the target is found
@@ -147,6 +154,8 @@ public class TrackableEventHandler : MonoBehaviour,
     {
         Renderer[] rendererComponents = GetComponentsInChildren<Renderer>();
         Collider[] colliderComponents = GetComponentsInChildren<Collider>();
+		GameObject[] t = GetComponentsInChildren<GameObject> ();
+
 
         // Disable rendering:
         foreach (Renderer component in rendererComponents)
@@ -159,6 +168,12 @@ public class TrackableEventHandler : MonoBehaviour,
         {
             component.enabled = false;
         }
+
+		foreach (GameObject tc in t)
+		{
+			if (tc.layer == 4)
+				tc.active = false;
+		}
 
         Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost");
 

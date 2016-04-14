@@ -5,14 +5,26 @@ public class UpdateCharacter : MonoBehaviour
 {
 
     public bool isStaticObj;
-    public int targetNum;
+    public int objectNum;
+    public int gameIndex;
 
-    static Vector3[] snapPositions = {
+    static Vector3[] snapPositions1 = {
+        new Vector3( -80,100, -100),
+        new Vector3( 80,100, -100),
+    };
+
+
+    static Vector3[] snapPositions2 = {
         new Vector3(-240,100, -100),
         new Vector3( -80,100, -100),
         new Vector3( 80,100, -100),
         new Vector3( 240,100, -100),
     };
+
+
+
+    static Vector3[][] snapPositions = { snapPositions1, snapPositions2 };
+
 
     bool isAcquired = false;
     bool isShown = false;
@@ -21,14 +33,15 @@ public class UpdateCharacter : MonoBehaviour
     //bool isShown = true;
 
     int snapPosNum = -1;
+    
 
     // Use this for initialization
     void Start()
     {
-
-        UpdateRoot.augObjects[targetNum] = transform;
-        UpdateRoot.lastPosOfObj[targetNum] = transform.position;
-
+        UpdateRoot.augObjects[gameIndex][objectNum] = transform;
+        UpdateRoot.lastPosOfObj[gameIndex][objectNum] = transform.position;
+        UpdateRoot.objEnabled[gameIndex][objectNum] = false;
+        UpdateRoot.firstTimeShown[gameIndex][objectNum] = true;
     }
 
     void snapMyPosition()
@@ -37,11 +50,11 @@ public class UpdateCharacter : MonoBehaviour
 
         Vector3 p = this.transform.position;
 
-        double curMinDist = (p - snapPositions[0]).sqrMagnitude;
+        double curMinDist = (p - snapPositions[gameIndex][0]).sqrMagnitude;
 
-        for (int i = 1; i < snapPositions.Length; ++i)
+        for (int i = 1; i < snapPositions[gameIndex].Length; ++i)
         {
-            double d = (p - snapPositions[i]).sqrMagnitude;
+            double d = (p - snapPositions[gameIndex][i]).sqrMagnitude;
             if (d < curMinDist)
             {
                 closestSnapIndex = i;
@@ -51,35 +64,78 @@ public class UpdateCharacter : MonoBehaviour
 
 
         snapPosNum = closestSnapIndex;
-        Debug.Log("Snap position is " + snapPositions[snapPosNum]);
+        //Debug.Log("Snap position is " + snapPositions[gameIndex][snapPosNum]);
 
-        Vector3 newPosition = snapPositions[snapPosNum];
+        Vector3 newPosition = snapPositions[gameIndex][snapPosNum];
 
-        for (int i = 0; i < UpdateRoot.augObjects.Length; i++)
+        for (int i = 0; i < UpdateRoot.augObjects[gameIndex].Length; i++)
         {
-            if (UpdateRoot.lastPosOfObj[i] == newPosition)
+            if (UpdateRoot.lastPosOfObj[gameIndex][i] == newPosition)
             {
-                UpdateRoot.augObjects[i].position = UpdateRoot.lastPosOfObj[targetNum];
-                UpdateRoot.lastPosOfObj[i] = UpdateRoot.lastPosOfObj[targetNum];
-                Debug.Log("Object to be swapped is " + UpdateRoot.augObjects[i].name);
-                Debug.Log("Target position is " + UpdateRoot.lastPosOfObj[targetNum]);
+                UpdateRoot.augObjects[gameIndex][i].position = UpdateRoot.lastPosOfObj[gameIndex][objectNum];
+                UpdateRoot.lastPosOfObj[gameIndex][i] = UpdateRoot.lastPosOfObj[gameIndex][objectNum];
+                //Debug.Log("Object to be swapped is " + UpdateRoot.augObjects[gameIndex][i].name);
+                //Debug.Log("Target position is " + UpdateRoot.lastPosOfObj[gameIndex][objectNum]);
             }
         }
 
         transform.position = newPosition;
-        UpdateRoot.lastPosOfObj[targetNum] = newPosition;
+        UpdateRoot.lastPosOfObj[gameIndex][objectNum] = newPosition;
     }
+
+    // Animation data to move image from fiducial to position on acquire
+    //double lerpTimeBeg;
+    //double lerpTimeSpan = 5;
 
     // Update is called once per frame
     void Update()
     {
 
-        if (IMTargetSensor.currentIMTarget == targetNum)
+        if (UpdateRoot.curSeenObject[gameIndex] == objectNum)
+        {
+            //if (isAcquired == false)
+            //{
+            //    lerpTimeBeg = Time.time;
+            //}
+
             isAcquired = true;
+            UpdateRoot.objEnabled[gameIndex][objectNum] = true;
+        }
 
-        isShown = ((isAcquired) && (IMTargetSensor.currentIMTarget != -1));
+        //if (isAcquired)
+        //{
+        //    UpdateRoot.objEnabled[gameIndex][objectNum] = true;
+        //}
+        //isShown = isAcquired;
 
-        //Debug.Log("isAc = " + isAcquired + ", targetNum = " + targetNum + "IMTargetSensor.currentIMTarget" + IMTargetSensor.currentIMTarget);
+
+        ////if (Time.time <= lerpTimeBeg + lerpTimeSpan && Time.time > lerpTimeBeg && isAcquired)
+        ////{
+        ////    float t = (float)((Time.time - lerpTimeBeg) / lerpTimeSpan);
+        ////    transform.position = snapPositions[snapPosNum] * t;
+        ////}
+
+        isShown = ((isAcquired) && (UpdateRoot.curSeenObject[gameIndex] != -1) && !UpdateRoot.gameCompleted[gameIndex]);
+
+        //if (isShown && firstTimeShown)
+        //{
+        //    if (Time.time < startTime + 2)
+        //    {
+        //        transform.position = new Vector3(0, 50, 0);
+        //    }
+        //    else
+        //    {
+        //        transform.position = UpdateRoot.lastPosOfObj[gameIndex][objectNum];
+        //        firstTimeShown = false;
+        //    }
+        //}
+
+        ////Debug.Log("isAc = " + isAcquired + ", objectNum = " + objectNum + "IMTargetSensor.currentIMTarget" + IMTargetSensor.currentIMTarget);
+
+        if (UpdateRoot.gameCompleted[gameIndex])
+        {
+            isShown = false;
+        }
 
         foreach (Renderer r in GetComponentsInChildren<Renderer>())
         {
@@ -130,7 +186,7 @@ public class UpdateCharacter : MonoBehaviour
     {
         if (!isShown || isStaticObj)
         {
-            //Debug.Log("Object" + targetNum + " is not shown");
+            //Debug.Log("Object" + objectNum + " is not shown");
             return;
         }
 
@@ -147,7 +203,7 @@ public class UpdateCharacter : MonoBehaviour
             // Was that collider this one?
             if (hit.collider.gameObject == gameObject)
             {
-                Debug.Log("Object" + targetNum + " was the collider");
+                Debug.Log("Object" + objectNum + " was the collider");
 
                 // Set the current finger to this one
                 draggingFinger = finger;

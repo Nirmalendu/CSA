@@ -2,7 +2,7 @@
 using System.Collections;
 public class ReturnBack : MonoBehaviour {
 	public void OnClick(){
-		Debug.Log ("Clicked");
-		Application.LoadLevel (1);
+		//Debug.Log ("Clicked");
+		Application.LoadLevelAsync (1);
 	}
 }

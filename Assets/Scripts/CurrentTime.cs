@@ -4,29 +4,72 @@ using System.Collections;
 
 public class CurrentTime : MonoBehaviour {
 	public Text time;
-	public GameObject p;
+	public GameObject p0;
+	public GameObject p1;
+	public GameObject p2;
+	public GameObject p3;
+	public GameObject p4;
+	public GameObject p5;
+	public GameObject p6;
+
+	public GameObject[] locations = new GameObject[7];
+	//public Image di;
 	bool bShowButton = true;
-	public Sprite first_floor;
-	public Sprite second_floor;
-	public Sprite third_floor;
+
+	public GUISkin skin;
 	public struct Events
 	{
 		public string eventName;
 		public int h;
-		public Sprite a;
-		public int posX;
-		public int posY;
 
 	};
+	Events[] total = new Events[7];
 
 	Text s;
+
+
 	void Start(){
-		Events[] total = new Events[7];
-		total [0].h = 21;
-		total [0].eventName = "Game of Code";
-		total [0].a = first_floor;
-		total [0].posX = 50;
-		total [0].posY = 50;
+		total [0].h = 9;
+		total [0].eventName = "Technical Talk by Mr. Sree Hari Nagarulu (Microsoft IDC)<117>";
+	
+		locations [0] = p0;
+
+		locations [1] = p1;
+		locations [2] = p2;
+		locations [3] = p3;
+		locations [4] = p4;
+		locations [5] = p5;
+		locations [6] = p6;
+
+		//
+		total [1].h = 10;
+		total [1].eventName = "Tech quiz prelims<254>";
+
+		//
+		total [2].h = 11;
+		total [2].eventName = "Keynote Speech by Dr. Shivkumar Kalyanaraman (IBM Research - India)<117>";
+
+		//
+		total [3].h = 12;
+		total [3].eventName = "Tech quiz finals<254>";
+
+		//
+		total [4].h = 13;
+		total [4].eventName = "Title Sponsor talk by media.net<117>";
+
+		//
+		total [5].h = 14;
+		total [5].eventName = "Keynote Speech by Dr. S. K. Shivakumar (Former Director, ISAC)<117>";
+
+		//
+		total [6].h = 15;
+		total [6].eventName = "LAN party<Litec>";
+
+		//
+
+
+		//di.sprite = first_floor;
+
 	}
 	 void Update ()
 	{
@@ -37,35 +80,35 @@ public class CurrentTime : MonoBehaviour {
 		time.text = h + ":" + m + ":" + s;
 
 	}
-	void createObject(){
-		s = gameObject.AddComponent<Text> ();
-		s.text = "Hello World";
 
-	}
 	void OnGUI ()
 	{
 		System.DateTime a = System.DateTime.Now;
 		int h = a.Hour;
-		int m = a.Minute;
-		int s = a.Second;
-		if (GUI.Button (new Rect (100, 100, 150, 100), "About")) 
-			GUI.Label (new Rect (0, 100, 100, 100), "Nirmalendu");
+
+
+	 	if (bShowButton) {
+			for (int i = 0; i <= 6; i++) {
+				if (h == total[i].h ) {
+					GUI.skin = skin;
+
+					GUI.Label (new Rect (Screen.width/2, Screen.height/8, 100, 100), total[i].eventName);
+					//GUI.Button (new Rect (160, 10, 150, 100), "I am b button");
+					//GUI.Button (new Rect (30, 10, 150, 100), "I am b button");
+
+					if (GUI.Button (new Rect (Screen.width/2, Screen.height/3, 150, 80), "Show Location")) {
+						//GUI.Label (new Rect (Screen.width/2, Screen.height/8, 100, 100), "hi");
+
+						locations[i].SetActive (true);
+						locations[i].transform.localScale += new Vector3 (3f, 3f, 3f);
+						bShowButton = false;
+						//p.GetComponent<SpriteRenderer>().sprite = total[i].a;
+						//p.GetComponentInChildren<Image> ().rectTransform.anchoredPosition = new Vector2 (total [i].posX, total [i].posY);
 
 
 
 
-		if (bShowButton) {
-			if (h == h && m == m) {
-				GUI.Label (new Rect (0, 100, 100, 100), "Time for new event");
-				//GUI.Button (new Rect (160, 10, 150, 100), "I am b button");
-				//GUI.Button (new Rect (30, 10, 150, 100), "I am b button");
-				if (GUI.Button (new Rect (10, 10, 150, 100), "I am a button")) {
-					p.transform.localScale += new Vector3 (3f, 3f, 3f);
-					bShowButton = false;
-
-
-
-
+					}
 				}
 			}
 		}

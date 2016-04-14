@@ -10,8 +10,8 @@ public class IMTargetSensor : MonoBehaviour
     public int targetNum;
 
 
-    public static bool[] targetsEnabled = new bool[8];
-    public static Transform[] targetsTransforms = new Transform[8];
+    public static bool[] targetsEnabled = new bool[16];
+    public static Transform[] targetsTransforms = new Transform[16];
 
 
     void Start()

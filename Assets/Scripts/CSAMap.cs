@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class CSAMap : MonoBehaviour {
+	public GameObject LoadingScene;
+	public Image LoadingBar;
 
 	public void OnClick(){
-		Debug.Log ("Clicked");
-		Application.LoadLevel (3);
+		Application.LoadLevelAsync (3);
+
 	}
 
 }
